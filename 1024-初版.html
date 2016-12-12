@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	body{
+		font-family: "Helvetica Neue", Helvetica, STHeiTi, sans-serif;
+	}
+	table{
+		margin: 0 auto;
+		border: 10px solid #bbafa0;
+		border-radius:10px; 
+	}
+	td{
+		width: 100px;
+		height:100px;
+		margin: 10px;
+		font-size: 3rem;
+		color: #666;
+		text-align: center;
+		line-height: 100px;
+		border:10px solid #bbafa0;
+		background: #ccc2b4;
+	}
+	span{
+		display: inline-block;
+		width: 100px;
+		height:100px;
+		background: #eee4da;
+		/*opacity: 0.8;*/
+	}
+	span.active4{background:#ede0c8;}
+	span.active8{color:#fff;background:#f2b179;}
+	span.active16{color:#fff;background:#f59563;}
+	span.active32{color:#fff;background:#f67c5f;}
+	span.active64{color:#fff;background:#f65e3b;}
+	span.active128{color:#fff;background:#edcf72;}
+	span.active256{color:#fff;background:#edcf72;}
+	span.active512{color:#fff;background:#edcf72;}
+	span.active1024{color:#fff;background:#edcf72;}
+	</style>
+</head>
+<body>
+	<table cellspacing='0px';>
+	<tbody>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		</tbody>
+	</table>
+</body>
+</html>
+<script>
+function getTag(name,obj){
+	obj = obj || document;
+	var t = name.charAt(0);
+	var tag = name.substring(1);
+	if(t === '#'){
+		return document.getElementById(tag);
+	}else if(t === '.'){
+		var arr = [];
+		var eles = obj.getElementsByTagName('*');
+		for(var i=0;i<eles.length;i++){
+			var c = eles[i].className.split(' ');
+			for(var j=0;j<c.length;j++){
+				if(c[j] == tag){
+					arr.push(eles[i]);
+				}
+			}
+		}
+		return arr;
+	}else{
+		return obj.getElementsByTagName(name);
+	}
+}
+
+var table=document.getElementsByTagName('table')[0];
+var tb=table.tBodies[0];
+var tr=tb.getElementsByTagName('tr');
+var arr=[];arr.length=16;
+var blankSite=[];
+var blanktd={
+	left:'0',
+	right:'0',
+	top:'0',
+	bottom:'0'
+};
+var td=tb.getElementsByTagName('td');
+var tdLen=td.length;
+function randomBlank(){
+	for(var i=0;i<tdLen;i++){
+		if(!td[i].children[0]){
+			blankSite.push(i);
+		}
+	}
+	if(blankSite.length!=0){
+		var index=blankSite[Math.floor((Math.random()*blankSite.length))];
+		var span=document.createElement('span');
+		span.innerHTML='2';
+		td[index].appendChild(span);
+	console.log('aaaaaaaaa')
+		// console.log(index);
+		blankSite=[];
+	}else{
+		return;
+	}
+	
+}
+randomBlank();
+var num=0;
+document.onkeydown=function(e){
+	if(e.which==37){
+		num++;
+		fn('left');
+		randomBlank();
+	}
+	if(e.which==38){
+		fn('top');
+		randomBlank();
+	}
+}
+var rlen=4;
+var clen=4;
+function fn2(){
+	for(var i=0;i<rlen;i++){
+			var n=i;
+			for(var j=0;j<clen;j++){
+				var y=j;
+				if(tb.rows[n].cells[y].children[0]){
+					for(var x=y+1;x<clen;x++){
+						// console.log(n,y,x);
+						if(tb.rows[n].cells[x].children[0]&&tb.rows[n].cells[y].children[0].innerHTML==tb.rows[n].cells[x].children[0].innerHTML){
+							if(x-y==1){
+								// console.log('添加--1')
+								tb.rows[n].cells[x].removeChild(tb.rows[n].cells[x].children[0]);
+								tb.rows[n].cells[y].children[0].innerHTML*=2;
+								bgColor(tb.rows[n].cells[y].children[0]);
+							}else{
+								// console.log('添加--2');
+								var ll=0;
+								for(var mm=y+1;mm<x;mm++){
+									// console.log(tb.rows[n].cells[mm].children[0]);
+									if(tb.rows[n].cells[mm].children[0]){
+										// console.log('2-2');
+										break;}
+									else{ll++;}
+								}
+								if(ll==x-y-1){
+									tb.rows[n].cells[x].removeChild(tb.rows[n].cells[x].children[0]);
+								tb.rows[n].cells[y].children[0].innerHTML*=2;
+								bgColor(tb.rows[n].cells[y].children[0]);
+								}
+							}
+
+						}
+					}  
+				}
+			}
+			for(var j=0;j<clen;j++){ 
+				if(tb.rows[n].cells[j].children[0]){
+					blanktd.dir=j%4;
+					if(blanktd.dir!=0){
+						var y=j;
+						for(var m=0;m<y%4;m++){
+							if(tb.rows[n].cells[m].children[0]){
+								blanktd.dir--;
+							}
+						}
+						if(blanktd.dir!=0){
+							// console.log('移动元素',num)
+							tb.rows[n].cells[j-blanktd.dir].appendChild(tb.rows[n].cells[j].children[0]);
+						}
+					}
+				}    
+			 }
+		}
+}
+function fn1(){
+	for(var i=0;i<clen;i++){
+		var n=i;
+		for(var j=0;j<rlen;j++){
+			var y=j;
+			if(tb.rows[j].cells[n].children[0]){
+				for(var x=y+1;x<rlen;x++){
+					if(tb.rows[x].cells[n].children[0]&&tb.rows[y].cells[n].children[0].innerHTML==tb.rows[x].cells[n].children[0].innerHTML){
+						if(x-y==1){
+							tb.rows[x].cells[n].removeChild(tb.rows[x].cells[n].children[0]);
+							tb.rows[y].cells[n].children[0].innerHTML*=2;
+							bgColor(tb.rows[y].cells[n].children[0]);
+						}else{
+							var ll=0;
+							for(var mm=y+1;mm<x;mm++){
+								if(tb.rows[mm].cells[n].children[0]){break;}
+								else{ll++;}
+							}
+							if(ll==x-y-1){
+								tb.rows[x].cells[n].removeChild(tb.rows[x].cells[n].children[0]);
+							tb.rows[y].cells[n].children[0].innerHTML*=2;
+							bgColor(tb.rows[y].cells[n].children[0]);
+							}
+						}
+					}
+				}
+			}  
+		} 
+		for(var j=0;j<rlen;j++){ 
+			if(tb.rows[n].cells[j].children[0]){   
+				blanktd.dir=j%4;
+				if(blanktd.dir!=0){
+					for(var m=0;m<j%4;m++){
+						if(tb.rows[m].cells[n].children[0]){
+							blanktd.dir--;
+						}
+					}
+					if(blanktd.dir!=0){
+						tb.rows[j-blanktd.dir].cells[n].appendChild(tb.rows[j].cells[n].children[0]);
+					}
+				}
+			}
+		}  
+		 
+	}
+}
+function fn(dir){
+	if(dir=='left'){
+		fn2();
+	}
+	if(dir=='top'){
+		fn1();
+	}
+}
+function bgColor(obj){
+	var objText=obj.innerHTML;
+	switch(objText){
+		case '4':obj.className='active4';break;
+		case '8':obj.className='active8';break;
+		case '16':obj.className='active16';break;
+		case '64':obj.className='active64';break;
+		case '128':obj.className='active128';break;
+		case '256':obj.className='active256';break;
+		case '512':obj.className='active512';break;
+		case '1024':obj.className='active1024';break;
+	}
+}
+
+</script>
